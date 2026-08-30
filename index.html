@@ -286,6 +286,11 @@
   .time-log-row .tl-time{font-family:'IBM Plex Mono',monospace; color:var(--ink); font-weight:600;}
   .time-log-row .tl-seller{color:var(--ink-soft); font-size:11.5px;}
   .time-log-row .tl-items{font-size:11.5px; color:var(--ink-soft); margin-top:2px;}
+  .day-copy-btn{
+    width:100%; margin-top:12px; padding:9px; border-radius:8px; border:1px dashed var(--teal);
+    background:none; color:var(--teal-dark); font-weight:600; font-size:12px; cursor:pointer;
+    font-family:'IBM Plex Sans Thai',sans-serif;
+  }
 
   .export-btn{
     width:100%; padding:12px; margin-top:6px; border-radius:10px; border:1px dashed var(--teal);
@@ -832,27 +837,28 @@ function renderSummary(){
                 <div class="tl-items">${itemsStr}</div>
               </div>`;
             }).join('')}
+            <button class="day-copy-btn" data-copyday="${dk}">📋 คัดลอกข้อมูลวันนี้ (${d.label})</button>
           </div>
         </div>`;
       });
       html += `<div class="export-row">
         <button class="export-btn btn-xlsx" id="downloadXlsx">ดาวน์โหลดไฟล์ Excel</button>
-        <button class="export-btn" id="exportBtn">คัดลอกข้อความ</button>
+        <button class="export-btn" id="exportBtn">คัดลอกข้อความ (วันนี้)</button>
       </div>`;
     }
 
-    // Full report table, like the Report sheet in Excel: only items actually sold (all-time)
+    // Report table, like the Report sheet in Excel: only items actually sold TODAY
     const reportMap = {};
-    transactions.forEach(t=>t.items.forEach(i=>{
+    todays.forEach(t=>t.items.forEach(i=>{
       reportMap[i.name] = reportMap[i.name] || {qty:0, rev:0, price:i.price, cat:getItemCategory(i)};
       reportMap[i.name].qty += i.qty;
       reportMap[i.name].rev += i.qty * i.price;
     }));
     const grandTotal = Object.values(reportMap).reduce((s,r)=>s+r.rev,0);
 
-    html += `<div class="cat-label" style="margin-top:20px;">รายงานยอดขายทั้งหมด (สะสม)</div>`;
+    html += `<div class="cat-label" style="margin-top:20px;">รายงานยอดขายวันนี้</div>`;
     if(Object.keys(reportMap).length === 0){
-      html += `<div class="empty-note">ยังไม่มีรายการขาย</div>`;
+      html += `<div class="empty-note">ยังไม่มีรายการขายวันนี้</div>`;
     } else {
       html += `<div class="report-table">
         <div class="report-head"><span class="rn">รายการ</span><span class="rq">จำนวน</span><span class="rv">ยอดขาย</span></div>`;
@@ -883,9 +889,13 @@ function renderSummary(){
     renderSummary();
   }));
   const exp = document.getElementById('exportBtn');
-  if(exp) exp.addEventListener('click', openExportModal);
+  if(exp) exp.addEventListener('click', ()=>openExportModal(todayKey()));
   const dl = document.getElementById('downloadXlsx');
   if(dl) dl.addEventListener('click', downloadExcel);
+  el.querySelectorAll('[data-copyday]').forEach(b=>b.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    openExportModal(b.dataset.copyday);
+  }));
 
   const editBtn = document.getElementById('editDataBtn');
   if(editBtn) editBtn.addEventListener('click', ()=>{
@@ -1054,21 +1064,19 @@ function downloadExcel(){
   }
 }
 
-function buildExportText(){
-  const days = [...new Set(transactions.map(t=>t.dateKey))].sort();
+function buildExportText(dateKey){
+  const dk = dateKey || todayKey();
+  const {books, others} = splitDayByCategory(dk);
   let lines = [];
-  days.forEach(dk=>{
-    const {books, others} = splitDayByCategory(dk);
-    let first = true;
-    const pushLine = (name, price, qty, sub)=>{
-      lines.push(`${first?dk:''}\t${name}\t${price}\t${qty}\t${sub}`);
-      first = false;
-    };
-    Object.keys(books).forEach(n=>pushLine(n, books[n].price, books[n].qty, books[n].sub));
-    if(Object.keys(books).length) pushLine('ยอดเงินรวม สมุด', '', sumQty(books), sumSub(books));
-    Object.keys(others).forEach(n=>pushLine(n, others[n].price, others[n].qty, others[n].sub));
-    if(Object.keys(others).length) pushLine('ยอดเงินรวม อุปกรณ์การศึกษา', '', sumQty(others), sumSub(others));
-  });
+  let first = true;
+  const pushLine = (name, price, qty, sub)=>{
+    lines.push(`${first?dk:''}\t${name}\t${price}\t${qty}\t${sub}`);
+    first = false;
+  };
+  Object.keys(books).forEach(n=>pushLine(n, books[n].price, books[n].qty, books[n].sub));
+  if(Object.keys(books).length) pushLine('ยอดเงินรวม สมุด', '', sumQty(books), sumSub(books));
+  Object.keys(others).forEach(n=>pushLine(n, others[n].price, others[n].qty, others[n].sub));
+  if(Object.keys(others).length) pushLine('ยอดเงินรวม อุปกรณ์การศึกษา', '', sumQty(others), sumSub(others));
   return lines.join('\n');
 }
 
@@ -1218,11 +1226,14 @@ function openDatePicker(title, dateKeys, onPick, includeAllOption){
   }));
 }
 
-function openExportModal(){
+function openExportModal(dateKey){
+  const dk = dateKey || todayKey();
+  const match = transactions.find(t=>t.dateKey===dk);
+  const label = match ? match.dateLabel : dk;
   const back = document.createElement('div');
   back.className = 'modal-back';
   back.innerHTML = `<div class="modal">
-    <h3>ข้อมูลสำหรับวาง Excel</h3>
+    <h3>ข้อมูลสำหรับวาง Excel — ${label}</h3>
     <p>แตะ "คัดลอก" แล้ววางต่อท้ายรายการเดิมในชีทของคุณ (คอลัมน์ วันที่ / รายการ / ราคา / จำนวน / รวม เหมือนเดิม)</p>
     <textarea readonly id="exportText"></textarea>
     <div class="modal-actions">
@@ -1231,7 +1242,7 @@ function openExportModal(){
     </div>
   </div>`;
   document.body.appendChild(back);
-  document.getElementById('exportText').value = buildExportText();
+  document.getElementById('exportText').value = buildExportText(dk);
   document.getElementById('closeModal').addEventListener('click', ()=>back.remove());
   back.addEventListener('click', (e)=>{ if(e.target===back) back.remove(); });
   document.getElementById('copyModal').addEventListener('click', async ()=>{
