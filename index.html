@@ -341,6 +341,13 @@
     color:var(--ink); cursor:pointer;
   }
   .date-pick-btn.all{border:1px dashed var(--stamp); color:var(--stamp-dark); font-weight:600;}
+  .day-check-list{display:flex; flex-direction:column; gap:2px; max-height:320px; overflow:auto;}
+  .day-check-row{
+    display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px;
+    border:1px solid var(--line); background:var(--paper); font-size:13.5px; cursor:pointer;
+  }
+  .day-check-row input{width:17px; height:17px; flex-shrink:0; accent-color:var(--teal);}
+  .day-check-row.all{border:1px dashed var(--stamp); color:var(--stamp-dark); font-weight:600; margin-bottom:4px;}
   .modal-actions{display:flex; gap:8px; margin-top:10px;}
   .modal-actions button{
     flex:1; padding:11px; border-radius:9px; border:none; font-weight:600; font-size:13.5px; cursor:pointer;
@@ -474,7 +481,7 @@
     <div class="htop">
       <div class="htext">
         <div class="eyebrow">สหกรณ์โรงเรียนสถาพรศึกษา</div>
-        <h1>ร้านขายอุปกรณ์การเรียน</h1>
+        <h1>บันทึกการขาย</h1>
       </div>
       <img class="sigil" id="sigilImg" alt="ตราโรงเรียน">
     </div>
@@ -844,7 +851,8 @@ function renderSummary(){
       html += `<div class="export-row">
         <button class="export-btn btn-xlsx" id="downloadXlsx">ดาวน์โหลดไฟล์ Excel</button>
         <button class="export-btn" id="exportBtn">คัดลอกข้อความ (วันนี้)</button>
-      </div>`;
+      </div>
+      <button class="export-btn" id="exportMultiBtn" style="width:100%; margin-top:8px;">📅 คัดลอกหลายวัน...</button>`;
     }
 
     // Report table, like the Report sheet in Excel: only items actually sold TODAY
@@ -890,6 +898,8 @@ function renderSummary(){
   }));
   const exp = document.getElementById('exportBtn');
   if(exp) exp.addEventListener('click', ()=>openExportModal(todayKey()));
+  const expMulti = document.getElementById('exportMultiBtn');
+  if(expMulti) expMulti.addEventListener('click', openMultiDayPicker);
   const dl = document.getElementById('downloadXlsx');
   if(dl) dl.addEventListener('click', downloadExcel);
   el.querySelectorAll('[data-copyday]').forEach(b=>b.addEventListener('click', (e)=>{
@@ -1064,20 +1074,24 @@ function downloadExcel(){
   }
 }
 
-function buildExportText(dateKey){
-  const dk = dateKey || todayKey();
-  const {books, others} = splitDayByCategory(dk);
-  let lines = [];
-  let first = true;
-  const pushLine = (name, price, qty, sub)=>{
-    lines.push(`${first?dk:''}\t${name}\t${price}\t${qty}\t${sub}`);
-    first = false;
-  };
-  Object.keys(books).forEach(n=>pushLine(n, books[n].price, books[n].qty, books[n].sub));
-  if(Object.keys(books).length) pushLine('ยอดเงินรวม สมุด', '', sumQty(books), sumSub(books));
-  Object.keys(others).forEach(n=>pushLine(n, others[n].price, others[n].qty, others[n].sub));
-  if(Object.keys(others).length) pushLine('ยอดเงินรวม อุปกรณ์การศึกษา', '', sumQty(others), sumSub(others));
-  return lines.join('\n');
+function buildExportText(dateKeyOrKeys){
+  const dks = Array.isArray(dateKeyOrKeys) ? [...dateKeyOrKeys].sort()
+             : dateKeyOrKeys ? [dateKeyOrKeys] : [todayKey()];
+  const dayBlocks = dks.map(dk=>{
+    const {books, others} = splitDayByCategory(dk);
+    let lines = [];
+    let first = true;
+    const pushLine = (name, price, qty, sub)=>{
+      lines.push(`${first?dk:''}\t${name}\t${price}\t${qty}\t${sub}`);
+      first = false;
+    };
+    Object.keys(books).forEach(n=>pushLine(n, books[n].price, books[n].qty, books[n].sub));
+    if(Object.keys(books).length) pushLine('ยอดเงินรวม สมุด', '', sumQty(books), sumSub(books));
+    Object.keys(others).forEach(n=>pushLine(n, others[n].price, others[n].qty, others[n].sub));
+    if(Object.keys(others).length) pushLine('ยอดเงินรวม อุปกรณ์การศึกษา', '', sumQty(others), sumSub(others));
+    return lines.join('\n');
+  });
+  return dayBlocks.join('\n\t\t\t\t\n');
 }
 
 function openAdminGate(title, message, onSuccess){
@@ -1226,10 +1240,51 @@ function openDatePicker(title, dateKeys, onPick, includeAllOption){
   }));
 }
 
-function openExportModal(dateKey){
-  const dk = dateKey || todayKey();
-  const match = transactions.find(t=>t.dateKey===dk);
-  const label = match ? match.dateLabel : dk;
+function openMultiDayPicker(){
+  const dateKeys = [...new Set(transactions.map(t=>t.dateKey))].sort().reverse();
+  const labelFor = dk => (transactions.find(t=>t.dateKey===dk)||{}).dateLabel || dk;
+  const back = document.createElement('div');
+  back.className = 'modal-back';
+  const rowsHtml = dateKeys.map(dk=>`<label class="day-check-row">
+    <input type="checkbox" class="day-check" value="${dk}">
+    <span>${labelFor(dk)}</span>
+  </label>`).join('');
+  back.innerHTML = `<div class="modal">
+    <h3>เลือกวันที่ต้องการคัดลอก</h3>
+    <p>เลือกได้หลายวัน แล้วกด "คัดลอกที่เลือก"</p>
+    <div class="day-check-list">
+      ${dateKeys.length ? `<label class="day-check-row all">
+        <input type="checkbox" id="selectAllDays">
+        <span>เลือกทั้งหมด</span>
+      </label>` : ''}
+      ${rowsHtml || '<div class="empty-note">ยังไม่มีรายการขาย</div>'}
+    </div>
+    <div class="modal-actions">
+      <button class="btn-close" id="mdpCancel">ยกเลิก</button>
+      <button class="btn-copy" id="mdpConfirm">คัดลอกที่เลือก</button>
+    </div>
+  </div>`;
+  document.body.appendChild(back);
+  document.getElementById('mdpCancel').addEventListener('click', ()=>back.remove());
+  back.addEventListener('click', (e)=>{ if(e.target===back) back.remove(); });
+  const selectAll = document.getElementById('selectAllDays');
+  if(selectAll) selectAll.addEventListener('change', ()=>{
+    back.querySelectorAll('.day-check').forEach(cb=>{ cb.checked = selectAll.checked; });
+  });
+  document.getElementById('mdpConfirm').addEventListener('click', ()=>{
+    const chosen = [...back.querySelectorAll('.day-check:checked')].map(cb=>cb.value);
+    if(chosen.length === 0){ showToast('เลือกอย่างน้อย 1 วัน'); return; }
+    back.remove();
+    openExportModal(chosen);
+  });
+}
+
+function openExportModal(dateKeyOrKeys){
+  const dks = Array.isArray(dateKeyOrKeys) ? [...dateKeyOrKeys].sort()
+             : dateKeyOrKeys ? [dateKeyOrKeys] : [todayKey()];
+  const labelFor = dk => (transactions.find(t=>t.dateKey===dk)||{}).dateLabel || dk;
+  const label = dks.length === 1 ? labelFor(dks[0])
+              : `${dks.length} วัน (${labelFor(dks[0])} – ${labelFor(dks[dks.length-1])})`;
   const back = document.createElement('div');
   back.className = 'modal-back';
   back.innerHTML = `<div class="modal">
@@ -1242,7 +1297,7 @@ function openExportModal(dateKey){
     </div>
   </div>`;
   document.body.appendChild(back);
-  document.getElementById('exportText').value = buildExportText(dk);
+  document.getElementById('exportText').value = buildExportText(dks);
   document.getElementById('closeModal').addEventListener('click', ()=>back.remove());
   back.addEventListener('click', (e)=>{ if(e.target===back) back.remove(); });
   document.getElementById('copyModal').addEventListener('click', async ()=>{
