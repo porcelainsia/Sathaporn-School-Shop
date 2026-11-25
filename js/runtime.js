@@ -119,7 +119,9 @@ export class DCLogic {
   constructor(){ this.state = {}; this._host = null; }
   setState(patch, cb){
     const next = typeof patch === 'function' ? patch(this.state) : patch;
+    const prev = this.state;
     this.state = Object.assign({}, this.state, next);
+    if (this.afterState) this.afterState(prev, this.state);
     if (this._host) this._host.forceUpdate(cb);
     else if (cb) cb();
   }
@@ -131,7 +133,7 @@ export function mount(LogicClass, templateEl, rootEl){
   const roots = Array.from(tpl.childNodes);
   const renderAll = compileChildren(roots);
   class Host extends PComponent {
-    constructor(){ super(); this.logic = new LogicClass(); this.logic._host = this; }
+    constructor(){ super(); this.logic = new LogicClass(); this.logic._host = this; window.__app = this.logic; }
     componentDidMount(){ if (this.logic.componentDidMount) this.logic.componentDidMount(); }
     componentDidUpdate(){ if (this.logic.componentDidUpdate) this.logic.componentDidUpdate(); }
     componentWillUnmount(){ if (this.logic.componentWillUnmount) this.logic.componentWillUnmount(); }

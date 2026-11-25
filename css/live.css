@@ -1,0 +1,3 @@
+/* Differences between the design prototype and the real app. */
+/* The prototype could switch between owner and helper views; the real app uses the signed-in account. */
+.seg[aria-label="ดูในฐานะ"]{display:none!important}

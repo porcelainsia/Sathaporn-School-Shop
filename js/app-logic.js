@@ -1,6 +1,7 @@
 import { DCLogic } from './runtime.js';
+import { DATA } from './data.js';
 
-var TODAY = '2026-10-22';
+var TODAY = DATA.today;
 var THM = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function thDate(iso){ if(!iso) return ''; var p = iso.split('-').map(Number); return p[2]+' '+THM[p[1]-1]+' '+(p[0]+543); }
 function thShort(iso){ var p = iso.split('-').map(Number); return p[2]+' '+THM[p[1]-1]; }
@@ -10,152 +11,7 @@ function addDays(iso,n){ var d = new Date(iso+'T00:00:00Z'); d.setUTCDate(d.getU
 function U(id, groups, gender, part, tone, icon, name, size, price, stock){
   return {id:id, shop:'u', groups:groups, gender:gender, part:part, tone:tone, icon:icon, name:name, size:size, price:price, stock:stock};
 }
-var PRODUCTS = [
-  U('shirt_f_30',['student'],'girl','top','girl','shirt','เสื้อนักเรียนหญิง','30',200,13),
-  U('shirt_f_32',['student'],'girl','top','girl','shirt','เสื้อนักเรียนหญิง','32',220,4),
-  U('shirt_f_34',['student'],'girl','top','girl','shirt','เสื้อนักเรียนหญิง','34',220,27),
-  U('shirt_f_36',['student'],'girl','top','girl','shirt','เสื้อนักเรียนหญิง','36',240,1),
-  U('shirt_f_38',['student'],'girl','top','girl','shirt','เสื้อนักเรียนหญิง','38',240,31),
-  U('shirt_f_40',['student'],'girl','top','girl','shirt','เสื้อนักเรียนหญิง','40',260,5),
-  U('shirt_f_42',['student'],'girl','top','girl','shirt','เสื้อนักเรียนหญิง','42',260,0),
-  U('shirt_f_44',['student'],'girl','top','girl','shirt','เสื้อนักเรียนหญิง','44',270,0),
-  U('shirt_f_46',['student'],'girl','top','girl','shirt','เสื้อนักเรียนหญิง','46',270,2),
-  U('shirt_f_48',['student'],'girl','top','girl','shirt','เสื้อนักเรียนหญิง','48',280,11),
-  U('shirt_f_50',['student'],'girl','top','girl','shirt','เสื้อนักเรียนหญิง','50',280,0),
-  U('shirt_m_30',['student'],'boy','top','boy','shirt','เสื้อนักเรียนชาย','30',200,0),
-  U('shirt_m_32',['student'],'boy','top','boy','shirt','เสื้อนักเรียนชาย','32',220,7),
-  U('shirt_m_34',['student'],'boy','top','boy','shirt','เสื้อนักเรียนชาย','34',220,21),
-  U('shirt_m_36',['student'],'boy','top','boy','shirt','เสื้อนักเรียนชาย','36',240,5),
-  U('shirt_m_38',['student'],'boy','top','boy','shirt','เสื้อนักเรียนชาย','38',240,58),
-  U('shirt_m_40',['student'],'boy','top','boy','shirt','เสื้อนักเรียนชาย','40',260,0),
-  U('shirt_m_42',['student'],'boy','top','boy','shirt','เสื้อนักเรียนชาย','42',260,0),
-  U('shirt_m_44',['student'],'boy','top','boy','shirt','เสื้อนักเรียนชาย','44',270,0),
-  U('shirt_m_46',['student'],'boy','top','boy','shirt','เสื้อนักเรียนชาย','46',270,2),
-  U('shirt_m_48',['student'],'boy','top','boy','shirt','เสื้อนักเรียนชาย','48',280,1),
-  U('shirt_m_50',['student'],'boy','top','boy','shirt','เสื้อนักเรียนชาย','50',280,1),
-  U('shirt_m_52',['student'],'boy','top','boy','shirt','เสื้อนักเรียนชาย','52',210,0),
-  U('skirt_20',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','20',195,0),
-  U('skirt_21',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','21',195,0),
-  U('skirt_22',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','22',195,0),
-  U('skirt_23',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','23',210,2),
-  U('skirt_24',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','24',210,1),
-  U('skirt_25',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','25',230,4),
-  U('skirt_26',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','26',230,18),
-  U('skirt_27',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','27',240,18),
-  U('skirt_28',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','28',240,23),
-  U('skirt_29',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','29',250,8),
-  U('skirt_30',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','30',250,17),
-  U('skirt_31',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','31',255,8),
-  U('skirt_32',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','32',255,1),
-  U('skirt_33',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','33',260,11),
-  U('skirt_34',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','34',260,3),
-  U('skirt_35',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','35',265,2),
-  U('skirt_36',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','36',265,2),
-  U('skirt_37',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','37',270,0),
-  U('skirt_38',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','38',270,0),
-  U('skirt_39',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','39',280,0),
-  U('skirt_40',['student'],'girl','bottom','girl','skirt','กระโปรงนักเรียน','40',280,0),
-  U('pants_m_20',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','20',195,0),
-  U('pants_m_21',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','21',195,0),
-  U('pants_m_22',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','22',195,1),
-  U('pants_m_23',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','23',210,18),
-  U('pants_m_24',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','24',210,10),
-  U('pants_m_25',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','25',230,0),
-  U('pants_m_26',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','26',230,7),
-  U('pants_m_27',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','27',240,0),
-  U('pants_m_28',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','28',240,0),
-  U('pants_m_29',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','29',250,0),
-  U('pants_m_30',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','30',250,0),
-  U('pants_m_31',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','31',255,0),
-  U('pants_m_32',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','32',255,0),
-  U('pants_m_33',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','33',260,0),
-  U('pants_m_34',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','34',260,0),
-  U('pants_m_35',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','35',265,0),
-  U('pants_m_36',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','36',265,0),
-  U('pants_m_37',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','37',270,0),
-  U('pants_m_38',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','38',270,0),
-  U('pants_m_39',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','39',280,0),
-  U('pants_m_40',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','40',280,0),
-  U('pants_m_46',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','46',300,3),
-  U('pants_m_50',['student'],'boy','bottom','boy','pants','กางเกงนักเรียน','50',350,3),
-  U('pe_shirt_1',['pe'],'both','top','pe','tee','เสื้อพละ','1',180,22),
-  U('pe_shirt_2',['pe'],'both','top','pe','tee','เสื้อพละ','2',190,24),
-  U('pe_shirt_3',['pe'],'both','top','pe','tee','เสื้อพละ','3',200,0),
-  U('pe_shirt_4',['pe'],'both','top','pe','tee','เสื้อพละ','4',220,0),
-  U('pe_shirt_5',['pe'],'both','top','pe','tee','เสื้อพละ','5',240,0),
-  U('pe_shirt_S',['pe'],'both','top','pe','tee','เสื้อพละ','S',250,0),
-  U('pe_shirt_M',['pe'],'both','top','pe','tee','เสื้อพละ','M',250,4),
-  U('pe_shirt_L',['pe'],'both','top','pe','tee','เสื้อพละ','L',260,3),
-  U('pe_shirt_XL',['pe'],'both','top','pe','tee','เสื้อพละ','XL',260,4),
-  U('pe_shirt_XXL',['pe'],'both','top','pe','tee','เสื้อพละ','XXL',200,0),
-  U('pe_pants_1',['pe'],'both','bottom','pe','pants','กางเกงพละ','1',200,0),
-  U('pe_pants_2',['pe'],'both','bottom','pe','pants','กางเกงพละ','2',200,4),
-  U('pe_pants_3',['pe'],'both','bottom','pe','pants','กางเกงพละ','3',220,5),
-  U('pe_pants_4',['pe'],'both','bottom','pe','pants','กางเกงพละ','4',230,2),
-  U('pe_pants_5',['pe'],'both','bottom','pe','pants','กางเกงพละ','5',230,0),
-  U('pe_pants_S',['pe'],'both','bottom','pe','pants','กางเกงพละ','S',240,0),
-  U('pe_pants_M',['pe'],'both','bottom','pe','pants','กางเกงพละ','M',240,4),
-  U('pe_pants_L',['pe'],'both','bottom','pe','pants','กางเกงพละ','L',250,0),
-  U('pe_pants_XL',['pe'],'both','bottom','pe','pants','กางเกงพละ','XL',250,0),
-  U('pe_pants_XXL',['pe'],'both','bottom','pe','pants','กางเกงพละ','XXL',200,0),
-  U('kg_girl_1',['kg','student'],'girl','set','kg','dress','ชุดนักเรียนอนุบาลหญิง','1',350,5),
-  U('kg_girl_2',['kg','student'],'girl','set','kg','dress','ชุดนักเรียนอนุบาลหญิง','2',350,8),
-  U('kg_girl_3',['kg','student'],'girl','set','kg','dress','ชุดนักเรียนอนุบาลหญิง','3',350,0),
-  U('kg_girl_4',['kg','student'],'girl','set','kg','dress','ชุดนักเรียนอนุบาลหญิง','4',350,13),
-  U('kg_girl_5',['kg','student'],'girl','set','kg','dress','ชุดนักเรียนอนุบาลหญิง','5',360,0),
-  U('kg_girl_S',['kg','student'],'girl','set','kg','dress','ชุดนักเรียนอนุบาลหญิง','S',370,5),
-  U('kg_girl_M',['kg','student'],'girl','set','kg','dress','ชุดนักเรียนอนุบาลหญิง','M',370,3),
-  U('kg_girl_L',['kg','student'],'girl','set','kg','dress','ชุดนักเรียนอนุบาลหญิง','L',370,0),
-  U('kg_boy_1',['kg','student'],'boy','set','kg','set','ชุดนักเรียนอนุบาลชาย','1',350,6),
-  U('kg_boy_2',['kg','student'],'boy','set','kg','set','ชุดนักเรียนอนุบาลชาย','2',350,0),
-  U('kg_boy_3',['kg','student'],'boy','set','kg','set','ชุดนักเรียนอนุบาลชาย','3',350,5),
-  U('kg_boy_4',['kg','student'],'boy','set','kg','set','ชุดนักเรียนอนุบาลชาย','4',350,0),
-  U('kg_boy_5',['kg','student'],'boy','set','kg','set','ชุดนักเรียนอนุบาลชาย','5',360,0),
-  U('kg_boy_S',['kg','student'],'boy','set','kg','set','ชุดนักเรียนอนุบาลชาย','S',370,2),
-  U('kg_boy_M',['kg','student'],'boy','set','kg','set','ชุดนักเรียนอนุบาลชาย','M',370,0),
-  U('kg_boy_L',['kg','student'],'boy','set','kg','set','ชุดนักเรียนอนุบาลชาย','L',370,0),
-  U('kg_pe_1',['kg','pe'],'both','set','kg','set','ชุดพละอนุบาล','1',260,0),
-  U('kg_pe_2',['kg','pe'],'both','set','kg','set','ชุดพละอนุบาล','2',260,8),
-  U('kg_pe_3',['kg','pe'],'both','set','kg','set','ชุดพละอนุบาล','3',280,5),
-  U('kg_pe_4',['kg','pe'],'both','set','kg','set','ชุดพละอนุบาล','4',280,18),
-  U('kg_pe_5',['kg','pe'],'both','set','kg','set','ชุดพละอนุบาล','5',290,18),
-  U('kg_pe_S',['kg','pe'],'both','set','kg','set','ชุดพละอนุบาล','S',0,0),
-  U('kg_pe_M',['kg','pe'],'both','set','kg','set','ชุดพละอนุบาล','M',0,0),
-  U('kg_pe_L',['kg','pe'],'both','set','kg','set','ชุดพละอนุบาล','L',0,0),
-  U('kg_pe_XL',['kg','pe'],'both','set','kg','set','ชุดพละอนุบาล','XL',0,0),
-  S('st_book','paper','book','สมุดเล่มบาง',15,3,'สมุด','','','',''),
-  S('st_book_thick','paper','book','สมุดเล่มหนา',20,0,'สมุด','','','',''),
-  S('st_homework','paper','book','สมุดจดการบ้าน',15,33,'สมุด','','','',''),
-  S('st_draw','paper','paper','สมุดวาดรูป',10,0,'สมุด','','','',''),
-  S('st_card','paper','glue','ซองใส่บัตร',10,100,'บัตร','','','',''),
-  S('st_lanyard','paper','glue','สายห้อยบัตร',60,174,'บัตร','','','',''),
-  S('st_pen','write','pen','ปากกาน้ำเงิน',5,20,'เครื่องเขียน','','','',''),
-  S('st_pen_red','write','pen','ปากกาแดง',5,60,'เครื่องเขียน','','','',''),
-  S('st_fluid','write','eraser','น้ำยาลบคำผิด',10,0,'เครื่องเขียน','','','',''),
-  S('st_pencil','write','pencil','ดินสอ 2B',5,126,'เครื่องเขียน','','','',''),
-  S('st_pencil_hb','write','pencil','ดินสอ HB',5,244,'เครื่องเขียน','','','',''),
-  S('st_eraser','write','eraser','ยางลบ',5,16,'เครื่องเขียน','','','',''),
-  S('st_eraser_big','write','eraser','ยางลบใหญ่',10,0,'เครื่องเขียน','','','',''),
-  S('st_ruler','write','ruler','ไม้บรรทัด',5,29,'เครื่องเขียน','','','',''),
-  S('st_sharpener','write','pencil','กบเหลาดินสอ',5,72,'เครื่องเขียน','','','',''),
-  S('st_woggle_s_metal','tools','scissors','วอกเกิ้ลลูกเสือ สามัญ (เหล็ก)',10,55,'วอกเกิ้ล','ลูกเสือ สามัญ','เหล็ก','m','สามัญ'),
-  S('st_woggle_s_leather','tools','scissors','วอกเกิ้ลลูกเสือ สามัญ (หนัง)',10,47,'วอกเกิ้ล','ลูกเสือ สามัญ','หนัง','m','สามัญ'),
-  S('st_woggle_g_metal','tools','scissors','วอกเกิ้ลเนตรนารี สามัญ (เหล็ก)',10,48,'วอกเกิ้ล','เนตรนารี สามัญ','เหล็ก','f','สามัญ'),
-  S('st_woggle_gc_leather','tools','scissors','วอกเกิ้ลเนตรนารี สำรอง (หนัง)',10,30,'วอกเกิ้ล','เนตรนารี สำรอง','หนัง','f','สำรอง'),
-  S('st_woggle_sc_leather','tools','scissors','วอกเกิ้ลลูกเสือ สำรอง (หนัง)',10,50,'วอกเกิ้ล','ลูกเสือ สำรอง','หนัง','m','สำรอง'),
-  S('st_woggle_gc','tools','scissors','วอกเกิ้ลเนตรนารี สำรอง',10,0,'วอกเกิ้ล','เนตรนารี สำรอง','','f','สำรอง'),
-  S('st_pin_s','tools','color','เข็มนางฟ้า สามัญ',15,20,'เข็ม','เข็มนางฟ้า สามัญ','','','สามัญ'),
-  S('st_pin_c','tools','color','เข็มนางฟ้า สำรอง',15,56,'เข็ม','เข็มนางฟ้า สำรอง','','','สำรอง'),
-  S('st_hatpin','tools','color','เข็มติดหมวก',10,58,'เข็ม','เข็มติดหมวก','','',''),
-  S('st_scarf_ss','tools','scissors','ผ้าพันคอ สามัญ',50,0,'ผ้าพันคอ','สามัญ','ลูกเสือและเนตรนารี','','สามัญ'),
-  S('st_scarf_c','tools','scissors','ผ้าพันคอ สำรอง',50,18,'ผ้าพันคอ','สำรอง','ลูกเสือและเนตรนารี','','สำรอง'),
-  S('st_hat_s3','tools','color','หมวกลูกเสือ สำรอง เบอร์ 3',50,6,'หมวก','ลูกเสือ สำรอง','เบอร์ 3','m','สำรอง'),
-  S('st_hat_s4','tools','color','หมวกลูกเสือ สำรอง เบอร์ 4',50,2,'หมวก','ลูกเสือ สำรอง','เบอร์ 4','m','สำรอง'),
-  S('st_hat_g3','tools','color','หมวกเนตรนารี สำรอง เบอร์ 3',50,5,'หมวก','เนตรนารี สำรอง','เบอร์ 3','f','สำรอง'),
-  S('st_hat_g5','tools','color','หมวกเนตรนารี สำรอง เบอร์ 5',50,4,'หมวก','เนตรนารี สำรอง','เบอร์ 5','f','สำรอง'),
-  S('st_hat_g6','tools','color','หมวกเนตรนารี สำรอง เบอร์ 6',50,4,'หมวก','เนตรนารี สำรอง','เบอร์ 6','f','สำรอง'),
-  S('st_rope','tools','scissors','เชือกลูกเสือ',15,143,'เชือก','เชือกลูกเสือ','','','')
-];
+var PRODUCTS = DATA.products;
 function S(id, cat, icon, name, price, stock, grp, short, sub, sg, lv){ return {id:id, shop:'s', cat:cat, icon:icon, name:name, size:'', price:price, stock:stock, grp:grp||'', short:short||'', sub:sub||'', sg:sg||'', lv:lv||''}; }
 function sFlags(k, p){ return {iPencil:k==='pencil', iPen:k==='pen', iEraser:k==='eraser', iBook:k==='book', iPaper:k==='paper', iRuler:k==='ruler', iGlue:k==='glue', iScissors:k==='scissors', iColor:k==='color', icoM: icoStyle(p ? icoKey(p) : k)}; }
 var PMAP = {}; PRODUCTS.forEach(function(p){ PMAP[p.id] = p; });
@@ -163,8 +19,8 @@ var ALLP = PRODUCTS;
 function bn(v){ v = String(v == null ? '' : v); var u = v.charAt(0) === '฿'; return {n: u ? v.slice(1) : v, u: u}; }
 function itemLabel(id){ var p = PMAP[id]; return p.size ? p.name+' #'+p.size : p.name; }
 
-var BASE_NAMES = {'10231':'ด.ญ. พิมพ์ชนก ใจดี','10232':'ด.ช. ธนกร แสงทอง','10318':'ด.ญ. กัญญาณัฐ สุขสม','10405':'ด.ช. ภูริ วงศ์ไทย','20112':'ด.ญ. ณิชา มีสุข','20145':'ด.ช. ปัณณวัฒน์ ศรีสวัสดิ์'};
-var R1 = {id:'r1', term:'1/2569', eff:'2026-05-16', classes:{'10231':'ป.4/1','10232':'ป.4/1','10318':'ป.5/1','10405':'ป.6/1','20112':'อ.2','20145':'อ.3'}};
+var BASE_NAMES = DATA.names;
+var R1 = DATA.rosters[DATA.rosters.length - 1] || {id:"r0", term:"", eff:DATA.today, classes:{}};
 var NEW_FILE = {fileName:'รายชื่อนักเรียน ภาคเรียน 2-2569.xlsx', classes:{'10231':'ป.4/1','10232':'ป.4/1','10318':'ป.5/2','10405':'ป.6/1','20112':'อ.2','30017':'ป.4/2'}, names:{'30017':'ด.ช. วรวิช นาคดี'}};
 
 function gx(n){ n = n || ''; return /หญิง/.test(n) ? ' gf' : (/ชาย/.test(n) ? ' gm' : ''); }
@@ -191,42 +47,9 @@ function iconFlags(k, p){ return {iShirt:k==='shirt', iTee:k==='tee', iPants:k==
 function mkSale(id,date,time,shop,code,items,transfer,seller,tempName,transferTime){
   return {id:id, date:date, time:time, shop:shop, code:code||'', items:items.map(function(x){ return {pid:x[0], qty:x[1], price:PMAP[x[0]].price}; }), transfer:transfer||0, transferTime:transferTime||'', seller:seller||'ครู ก.', tempName:tempName||''};
 }
-var SEED_SALES = [
-  mkSale('s20','2025-05-15','09:30','u','10318',[['pe_shirt_M',1],['pe_pants_M',1]],0,'ครู ก.'),
-  mkSale('s1','2026-10-22','09:12','u','10231',[['shirt_f_34',2]],0,'ครู ก.'),
-  mkSale('s2','2026-10-22','10:05','s','',[['st_pencil',3],['st_book',2]],0,'ครู ก.'),
-  mkSale('s4','2026-10-22','08:30','u','30017',[['pants_m_24',1]],0,'ครู ข.','วรวิช'),
-  mkSale('s3','2026-10-21','13:40','u','10405',[['pe_shirt_M',1],['pe_pants_S',1]],490,'คุณ','','13:38'),
-  mkSale('s5','2026-10-19','11:00','s','',[['st_pen',5],['st_eraser',2]],0,'ครู ข.'),
-  mkSale('s9','2026-10-17','12:20','u','10232',[['shirt_m_34',1],['pants_m_24',1]],430,'คุณ','','12:18'),
-  mkSale('s6','2026-10-15','09:45','u','20112',[['kg_girl_2',1]],0,'ครู ก.'),
-  mkSale('s7','2026-10-08','14:10','u','10318',[['skirt_28',2],['shirt_f_34',2]],920,'คุณ','','14:05'),
-  mkSale('s8','2026-10-02','10:00','s','',[['st_book',10]],0,'ครู ข.'),
-  mkSale('s11','2026-10-14','10:15','u','10231',[['skirt_30',2],['shirt_f_36',3]],0,'ครู ก.'),
-  mkSale('s12','2026-10-13','09:30','s','',[['st_eraser',4],['st_pencil',6]],0,'ครู ข.'),
-  mkSale('s13','2026-10-09','13:20','u','10318',[['skirt_30',3],['shirt_f_36',5],['skirt_32',1]],0,'ครู ก.'),
-  mkSale('s14','2026-10-06','11:05','u','10232',[['skirt_30',3],['shirt_f_36',6]],0,'คุณ'),
-  mkSale('s15','2026-10-01','09:50','s','',[['st_eraser',6],['st_pen',4]],0,'ครู ข.'),
-  mkSale('s16','2026-09-29','14:30','u','10405',[['skirt_30',4],['shirt_f_36',6],['skirt_32',1]],0,'ครู ก.'),
-  mkSale('s10','2026-05-20','10:30','u','10318',[['skirt_26',1],['shirt_f_34',1]],0,'คุณ')
-];
-var SEED_RECEIPTS = [
-  {date:'2026-10-21', pid:'shirt_f_34', label:'เสื้อนักเรียนหญิง #34', qty:4, memo:'สถพ ซ 69/1002', cost:null, batch:'b1002'},
-  {date:'2026-10-21', pid:'shirt_m_38', label:'เสื้อนักเรียนชาย #38', qty:6, memo:'สถพ ซ 69/1002', cost:null, batch:'b1002'},
-  {date:'2026-10-21', pid:'skirt_30', label:'กระโปรงนักเรียน #30', qty:5, memo:'สถพ ซ 69/1002', cost:null, batch:'b1002'},
-  {date:'2026-09-14', pid:'shirt_m_38', label:'เสื้อนักเรียนชาย #38', qty:20, memo:'สถพ ซ 69/0921, สถพ สซ 69/0921-01', cost:170, batch:'b0921'},
-  {date:'2026-09-14', pid:'skirt_28', label:'กระโปรงนักเรียน #28', qty:10, memo:'สถพ ซ 69/0921, สถพ สซ 69/0921-01', cost:190, batch:'b0921'},
-  {date:'2026-09-02', pid:'st_book', label:'สมุดเล่มบาง', qty:60, memo:'สถพ ซ 69/0903', cost:null, batch:'b0874'}
-];
-var SEED_BATCHES = {
-  b1002:{id:'b1002', date:'2026-10-21', at:'15:20', by:'สมใจ', src:'import', dateFrom:'วันที่อัปโหลด',
-    memo:{no:'สถพ ซ 69/1002', date:'2026-10-20', file:'สถพ ซ 69-1002 ขออนุมัติจัดซื้อเครื่องแบบนักเรียน.pdf'}, po:null},
-  b0921:{id:'b0921', date:'2026-09-14', at:'10:42', by:'Porcelain', src:'import', dateFrom:'วันที่อัปโหลด',
-    memo:{no:'สถพ ซ 69/0921', date:'2026-09-12', file:'สถพ ซ 69-0921 ขออนุมัติจัดซื้อเครื่องแบบนักเรียน.pdf'},
-    po:{no:'สถพ สซ 69/0921-01', date:'2026-09-11', file:'สถพ สซ 69-0921-01 ร้านธนากรพาณิชย์.pdf'}},
-  b0874:{id:'b0874', date:'2026-09-02', at:'13:15', by:'สมใจ', src:'import', dateFrom:'วันที่ในบันทึกข้อความ',
-    memo:{no:'สถพ ซ 69/0903', date:'2026-09-02', file:'สถพ ซ 69-0903 ขออนุมัติจัดซื้อเครื่องเขียน.pdf'}, po:null}
-};
+var SEED_SALES = DATA.sales;
+var SEED_RECEIPTS = DATA.receipts;
+var SEED_BATCHES = DATA.batches;
 var DEMO_PO_DUP = {no:'สถพ สซ 69/1002-01', date:'2026-10-19', file:'สถพ สซ 69-1002-01 ร้านธนากรพาณิชย์.pdf', lines:[
   {k:'x1', doc:'เสื้อนักเรียนหญิง ประถม เบอร์ 34', pid:'shirt_f_34', qty:4, cost:175},
   {k:'x2', doc:'เสื้อนักเรียนชาย ประถม เบอร์ 38', pid:'shirt_m_38', qty:6, cost:170},
@@ -263,18 +86,7 @@ function findDup(batches, receipts, doc, excl){
   });
   return best;
 }
-var SEED_DEMAND = [
-  {date:'2026-10-20', time:'09:40', pid:'shirt_f_40', got:'shirt_f_36', code:'10318'},
-  {date:'2026-10-21', time:'12:05', pid:'shirt_f_40', got:null, code:'', name:'ด.ญ. ฟ้าใส (ยังไม่มีรหัส)'},
-  {date:'2026-10-22', time:'08:50', pid:'shirt_f_40', got:'shirt_f_36', code:'10231'},
-  {date:'2026-10-17', time:'12:30', pid:'pe_pants_M', got:'pe_pants_S', code:'10405'},
-  {date:'2026-10-21', time:'13:20', pid:'pe_pants_M', got:null, code:'10232'},
-  {date:'2026-09-08', time:'10:15', pid:'skirt_30', got:null, code:'10318', asks:[{date:'2026-09-08', time:'10:15', got:null},{date:'2026-09-15', time:'12:10', got:null},{date:'2026-09-29', time:'08:05', got:null}]},
-  {date:'2026-05-20', time:'09:00', pid:'shirt_m_52', got:null, code:'10405', asks:[{date:'2026-05-20', time:'09:00', got:null},{date:'2026-07-01', time:'12:20', got:null},{date:'2026-08-19', time:'10:45', got:null},{date:'2026-10-06', time:'08:30', got:null}]},
-  {date:'2026-09-10', time:'11:40', pid:'shirt_m_38', got:'shirt_m_34', code:'10232', notified:'2026-10-22'},
-  {date:'2026-10-19', time:'12:15', pid:'st_scarf_ss', got:null, code:'10231'},
-  {date:'2026-10-21', time:'08:20', pid:'st_scarf_ss', got:null, code:'', name:''}
-];
+var SEED_DEMAND = DATA.demand;
 var PICKUP = 'ห้องธุรการ';   // จุดรับของ ใช้ในข้อความแจ้งนักเรียน
 function bahtText(n){
   var D = ['','หนึ่ง','สอง','สาม','สี่','ห้า','หก','เจ็ด','แปด','เก้า'], U = ['','สิบ','ร้อย','พัน','หมื่น','แสน'];
@@ -368,14 +180,14 @@ export class Component extends DCLogic {
     var stock = {}, prices = {};
     PRODUCTS.forEach(function(p){ stock[p.id] = p.stock; prices[p.id] = p.price; });
     this.state = {
-      page:'dash', role:'owner', q:'', searchOpen:false, period:'week',
+      page:DATA.role === 'owner' ? 'dash' : 'sellU', role:DATA.role, me:DATA.me, auth:DATA.auth, q:'', searchOpen:false, period:'week',
       cartU:{}, cartS:{}, uFilter:'all', gFilter:'all', codeInput:'', tempName:'', transferInput:'', payMode:'cash', transferTime:'', dockOpen:false, sideMini:false, lFilter:'all', drawerOpen:false, filterOpen:false, pFilter:'all', editId:null, editPrice:'', editQty:'', editMemo:'', editDate:TODAY, imp2Open:false, imp2Step:0, memoLoaded:false, poLoaded:false, rDate:TODAY, impLines:null, impDone:'',
       sales: SEED_SALES.slice(), stock: stock, prices: prices,
       histFilter:'all', stockShop:'u', stockFilter:'all', restockOpen:null, restockQty:'', restockMemo:'',
-      receipts: SEED_RECEIPTS.slice(), demand: SEED_DEMAND.map(function(d, i){ return Object.assign({id:'d'+i}, d); }), cartWant:{}, cartPick:null, cartPickPos:null, wantPop:null, wantFor:null, wantCode:'', wantName:'', waitOpen:false, waitTab:'list', expOpen:false, expFmt:'pdf', expShop:null, expPrice:true, expCost:true, expZero:true, expDmd:true, expVer:'school', stuPop:null, waitShop:'all', waitQ:'',  memoOpen:false, memoNo:'', memoDate:'2026-10-22', memoQty:{}, memoOff:{}, memoLast:null, askHist:null, wxOpen:false, wxScope:'all', wxSort:'item', wxFmt:'pdf', stuWait:false, resvAsk:null, resvOk:{}, batches: Object.assign({}, SEED_BATCHES), rcvId:null, rcvDoc:'memo', rcvPid:null, rcvVoidAsk:false, replaceId:null, impMemoDoc:null, impPoDoc:null, dupAlert:null, studentQ:'', classFilter:'all', studentId:null,
-      rosters:[R1], names: Object.assign({}, BASE_NAMES), lastBackup:'2026-09-07', lastBackupAt:'', dStart:{date:'2026-10-21', amt:2871}, dMoves:[{id:'m1', date:TODAY, at:'10:15', dir:'out', kind:'สำรองจ่าย', amt:123, note:'ถ่าน AA รออนุมัติบันทึก', by:'Porcelain'}], mv:null,
-      importStep:0, fileChosen:false, termInput:'2/2569', effDate:'2026-10-22', doneTerm:'', doneEff:'',
-      staff:[{name:'ครู ก.', email:'[อีเมลครู ก.]'},{name:'ครู ข.', email:'[อีเมลครู ข.]'}], newStaff:'',
+      receipts: SEED_RECEIPTS.slice(), demand: SEED_DEMAND.slice(), cartWant:{}, cartPick:null, cartPickPos:null, wantPop:null, wantFor:null, wantCode:'', wantName:'', waitOpen:false, waitTab:'list', expOpen:false, expFmt:'pdf', expShop:null, expPrice:true, expCost:true, expZero:true, expDmd:true, expVer:'school', stuPop:null, waitShop:'all', waitQ:'',  memoOpen:false, memoNo:'', memoDate:TODAY, memoQty:{}, memoOff:{}, memoLast:null, askHist:null, wxOpen:false, wxScope:'all', wxSort:'item', wxFmt:'pdf', stuWait:false, resvAsk:null, resvOk:{}, batches: Object.assign({}, SEED_BATCHES), rcvId:null, rcvDoc:'memo', rcvPid:null, rcvVoidAsk:false, replaceId:null, impMemoDoc:null, impPoDoc:null, dupAlert:null, studentQ:'', classFilter:'all', studentId:null,
+      rosters:DATA.rosters.slice(), names: Object.assign({}, BASE_NAMES), lastBackup:DATA.lastBackup, lastBackupAt:DATA.lastBackupAt, dStart:DATA.dStart, dMoves:DATA.dMoves, closes:DATA.closes, merges:DATA.merges, mv:null,
+      importStep:0, fileChosen:false, termInput:'2/2569', effDate:TODAY, doneTerm:'', doneEff:'',
+      staff:DATA.staff, newStaff:'',
       transferEmail:'', transferStep:0, toast:''
     };
   }
@@ -539,7 +351,7 @@ export class Component extends DCLogic {
     var roleChips = [['owner','เจ้าของ'],['staff','ครูผู้ช่วย']].map(function(r){
       return {label:r[1], cls:'segb'+(s.role===r[0]?' on':''), pick:function(){ var u = {role:r[0]}; if (r[0]!=='owner' && OWNER.indexOf(self.state.page) >= 0) u.page = 'sellU'; self.setState(u); self.flash(r[0]==='owner'?'ดูในฐานะเจ้าของ':'ดูในฐานะครูผู้ช่วย: เห็นหน้าขาย ประวัติ และสต็อก'); }};
     });
-    var user = isOwner ? {name:'Porcelain', role:'เจ้าของระบบ', initial:'P'} : {name:'สมใจ', role:'ครูผู้ช่วย', initial:'ส'};
+    var user = {name:DATA.myName, role: isOwner ? 'เจ้าของระบบ' : 'ครูผู้ช่วย', initial:(DATA.myName || '?').charAt(0).toUpperCase()};
 
     // ---------- search ----------
     var q = (s.q||'').trim().toLowerCase();
@@ -629,7 +441,7 @@ export class Component extends DCLogic {
       cash: baht(cashT), transfer: baht(transferSum), cashPct: cashPct+'%', dash: (circ*cashPct/100).toFixed(1)+' '+circ.toFixed(1),
       totalLabel: 'ยอดขายรวม'+({today:'วันนี้', week:' 7 วัน', month:'เดือนนี้', term:'ภาคเรียนนี้'})[s.period],
       deltaCls: 'dchip'+(curT < prevT ? ' down' : ''), hasDelta: prevPs.length > 0 && prevT > 0, delta: (curT >= prevT ? '+' : '−')+Math.abs(Math.round((curT-prevT)/(prevT||1)*100))+'% จาก'+(s.period==='today' ? 'เมื่อวาน' : ' 7 วันก่อน'),
-      greet: (hr < 12 ? 'สวัสดีตอนเช้า' : (hr < 17 ? 'สวัสดีตอนบ่าย' : 'สวัสดีตอนเย็น'))+', '+(isOwner ? 'Porcelain' : 'ครู ก.'),
+      greet: (hr < 12 ? 'สวัสดีตอนเช้า' : (hr < 17 ? 'สวัสดีตอนบ่าย' : 'สวัสดีตอนเย็น'))+', '+(isOwner ? DATA.myName : 'ครู ก.'),
       rangeLabel: s.period==='today' ? 'วันนี้ '+thDate(TODAY) : thDate(since)+' – '+thDate(TODAY)
     };
     var periods = [['today','วันนี้'],['week','7 วัน'],['month','เดือนนี้'],['term','ภาคเรียนนี้']].map(function(p){
@@ -744,7 +556,7 @@ export class Component extends DCLogic {
         close:function(){ self.setState({clsShop:null}); },
         go:function(){ var st = self.state; if (!cany){ self.flash('กรอกจำนวนที่นับได้ก่อน'); return; } if (cbad && !st.clsReason){ self.flash('เลือกสาเหตุของส่วนต่างก่อน'); return; }
           if (forgot){ self.flash('บันทึกเงินเข้า/ออกที่ลืมก่อน แล้วยอดจะคำนวณใหม่'); return; } if (noteMiss){ self.flash('ใส่หมายเหตุก่อน'); return; }
-          var rec = {date:TODAY, at:nowHM(), shop:csh, opening: isS ? dOpen.amt : 0, sales:cAmt, out: isS ? outT : 0, in: isS ? inT : 0, expected:cExp, counted:csum, diff:cdiff, reason: cdiff ? st.clsReason : '', note: cdiff ? (st.clsNote||'') : '', by: st.role==='owner' ? 'Porcelain' : 'สมใจ'};
+          var rec = {date:TODAY, at:nowHM(), shop:csh, opening: isS ? dOpen.amt : 0, sales:cAmt, out: isS ? outT : 0, in: isS ? inT : 0, expected:cExp, counted:csum, diff:cdiff, reason: cdiff ? st.clsReason : '', note: cdiff ? (st.clsNote||'') : '', by: DATA.myName};
           self.setState({closes:[rec].concat(st.closes||[]), clsShop:null, clsCnt:{}, clsReason:'', clsNote:''});
           if (!isS) self.setState({cpv:{k:'u', date:TODAY}});
           else self.okFlash('ปิดยอดแล้ว', baht(csum), 'คัดลอกยอดวันนี้', function(){ self.setState({toastOk:null, cpv:{k:'s', date:TODAY}}); }, (cdiff ? (cdiff<0 ? 'ขาด ' : 'เกิน ')+baht(Math.abs(cdiff))+' ' : '')+'พรุ่งนี้เริ่มที่ '+baht(csum)); }};
@@ -771,7 +583,7 @@ export class Component extends DCLogic {
         btnCls:'btn'+(mOk ? '' : ' dis'), btnLabel: mIn ? 'บันทึกเงินเข้า' : 'บันทึกเงินออก',
         close:function(){ self.setState({mv:null}); },
         go:function(){ if (!mm.kind){ self.flash('เลือกรายการก่อน'); return; } if (mAmt <= 0){ self.flash('ใส่จำนวนเงินก่อน'); return; } if (over){ self.flash('เงินในลิ้นชักมีไม่พอ'); return; } if (mNoteMiss){ self.flash('ใส่หมายเหตุก่อน'); return; }
-          var st = self.state, rec = {id:'m'+Date.now(), date:TODAY, at:nowHM(), dir:mm.dir, kind:mm.kind, amt:mAmt, note:(mm.note||'').trim(), after:!!cS, by: st.role==='owner' ? 'Porcelain' : 'สมใจ'};
+          var st = self.state, rec = {id:'m'+Date.now(), date:TODAY, at:nowHM(), dir:mm.dir, kind:mm.kind, amt:mAmt, note:(mm.note||'').trim(), after:!!cS, by: DATA.myName};
           self.setState({dMoves:[rec].concat(st.dMoves||[]), mv:null});
           self.okFlash(mIn ? 'บันทึกเงินเข้าแล้ว' : 'บันทึกเงินออกแล้ว', baht(mAmt), '', null, rec.kind+(rec.note ? ' '+rec.note : ''), '', function(){ self.setState({dMoves:(self.state.dMoves||[]).filter(function(x){ return x.id !== rec.id; })}); }); }};
     }
@@ -1123,7 +935,7 @@ export class Component extends DCLogic {
         if (isTr && !st.transferTime){ self.setState({dockOpen:true}); self.flash('กรอกเวลาที่โอนตามสลิปก่อนบันทึก'); return; }
         var tr = isTr ? tot : 0;
         var now = new Date(), time = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-        var sale = {id:'n'+Date.now(), date:TODAY, time:time, shop:shop, code:cd, items:items, transfer:tr, transferTime: isTr ? st.transferTime : '', slip: isTr && st.trSlip ? st.trSlip.name : '', seller: st.role==='owner'?'Porcelain':'สมใจ', tempName: st.names[cd] ? '' : (st.nameInput||'')};
+        var sale = {id:'n'+Date.now(), date:TODAY, time:time, shop:shop, code:cd, items:items, transfer:tr, transferTime: isTr ? st.transferTime : '', slip: isTr && st.trSlip ? st.trSlip.name : '', seller: DATA.myName, tempName: st.names[cd] ? '' : (st.nameInput||'')};
         var stock = Object.assign({}, st.stock); items.forEach(function(i){ stock[i.pid] -= i.qty; });
         var flagged = shop==='u' && !self.classFor(cd, TODAY);
         var newDemand = shop==='u' ? ids.filter(function(id){ return st.cartWant && st.cartWant[id]; }).map(function(id){ return {id:'d'+Date.now()+id, date:TODAY, time:time, pid:st.cartWant[id], got:id, code:cd}; }) : [];
@@ -1718,7 +1530,7 @@ export class Component extends DCLogic {
       okt: (function(){ var t = s.toastOk; if (!t) return {on:false}; var sellPg = s.page==='sellU' || s.page==='sellS';
         return {on:true, cls:'okt'+(t.cls?' '+t.cls:'')+(sellPg?' up':''), text:t.text, amt:t.amt, hasAmt:!!t.amt, sub:t.sub, hasSub:!!t.sub, actLabel:t.actLabel, hasAct:!!(t.act && t.actLabel), act:t.act, hasUndo:!!t.undo, undo:function(){ var u = t.undo; clearTimeout(self._ot); self.setState({toastOk:null}); if (u) u(); }, isInfo: t.cls==='info', notInfo: t.cls!=='info', hasActs: !!(t.undo || (t.act && t.actLabel))}; })(),
       lg: {on: !!s.auth && s.auth !== 'in', login: s.auth === 'login', denied: s.auth === 'denied',
-        signIn: function(){ self.setState({auth:'in'}); self.okFlash('เข้าสู่ระบบแล้ว'); }, other: function(){ self.setState({auth:'login'}); }, retry: function(){ self.setState({auth:'in'}); }},
+        signIn: function(){ DATA.signIn(); }, other: function(){ DATA.signOut(); }, retry: function(){ location.reload(); }},
       demo: {offLabel: s.offline ? 'กลับมาออนไลน์' : 'จำลองออฟไลน์',
         toggleOff: function(){ if (self.state.offline){ var n = self.state.pending||0; self.setState({offline:false, pending:0}); self.okFlash(n ? 'กลับมาออนไลน์ ส่งยอดที่ค้างไว้ '+n+' รายการแล้ว' : 'กลับมาออนไลน์แล้ว', '', '', null, '', 'sync'); } else { self.setState({offline:true}); } },
         showLogin: function(){ self.setState({auth:'login'}); }, showDenied: function(){ self.setState({auth:'denied'}); }},
@@ -1790,7 +1602,7 @@ export class Component extends DCLogic {
       rcvAskVoid: function(){ if (self.state.role !== 'owner'){ self.flash('เฉพาะเจ้าของระบบ'); return; } self.setState({rcvVoidAsk:true}); },
       rcvCancelVoid: function(){ self.setState({rcvVoidAsk:false}); },
       rcvConfirmVoid: function(){if (self.state.role !== 'owner'){ self.flash('เฉพาะเจ้าของระบบ'); return; } 
-        var st = self.state, id = st.rcvId, b = st.batches[id], sk = Object.assign({}, st.stock), bt = Object.assign({}, st.batches), q = 0, by = st.role==='owner' ? 'Porcelain' : 'สมใจ', at = thDate(TODAY)+' '+nowHM();
+        var st = self.state, id = st.rcvId, b = st.batches[id], sk = Object.assign({}, st.stock), bt = Object.assign({}, st.batches), q = 0, by = DATA.myName, at = thDate(TODAY)+' '+nowHM();
         st.receipts.forEach(function(r){ if (r.batch === id){ sk[r.pid] = (sk[r.pid]||0) - r.qty; q += r.qty; } });
         bt[id] = Object.assign({}, b, {voided:{at:at, by:by}, log:(b.log||[]).concat([{at:at, by:by, text:'ยกเลิกการรับเข้า: หักสต็อกออก '+q+' ชิ้น'}])});
         self.setState({stock:sk, batches:bt, rcvVoidAsk:false}); self.flash('ยกเลิกการรับเข้า '+batchTitle(b)+' แล้ว (หักสต็อก '+q+' ชิ้น)'); },
@@ -1802,7 +1614,7 @@ export class Component extends DCLogic {
         self.setState({dupAlert:null, imp2Open:false, imp2Step:0, memoLoaded:false, poLoaded:false, impMemoDoc:null, impPoDoc:null, impLines:null, replaceId:null, rcvId:a.id, rcvDoc:'memo', rcvPid:null}); },
       dupReplace: function(){ var a = self.state.dupAlert; self.setState({dupAlert:null, replaceId:a.id}); self.flash('เปลี่ยนเป็นโหมดแก้ไขล็อต '+batchTitle(self.state.batches[a.id])); },
       dupAttach: function(){if (self.state.role !== 'owner'){ self.flash('เฉพาะเจ้าของระบบ'); return; } 
-        var st = self.state, a = st.dupAlert, bt = Object.assign({}, st.batches), b = Object.assign({}, bt[a.id]), by = st.role==='owner' ? 'Porcelain' : 'สมใจ', at = thDate(TODAY)+' '+nowHM();
+        var st = self.state, a = st.dupAlert, bt = Object.assign({}, st.batches), b = Object.assign({}, bt[a.id]), by = DATA.myName, at = thDate(TODAY)+' '+nowHM();
         b[a.kind] = a.doc; b.log = (b.log||[]).concat([{at:at, by:by, text:'แนบ '+(a.kind==='po' ? '' : 'บันทึกข้อความ ')+a.doc.no+' เข้ากับล็อตนี้ (สต็อกไม่เปลี่ยน'+(a.kind==='po' ? ', เติมราคาทุน' : '')+')'}]); bt[a.id] = b;
         var memoTxt = [b.memo && b.memo.no, b.po && b.po.no].filter(Boolean).join(', ');
         var rc = st.receipts.map(function(r){ if (r.batch !== a.id) return r; var l = (a.doc.lines||[]).filter(function(x){ return x.pid === r.pid; })[0];
@@ -1825,7 +1637,7 @@ export class Component extends DCLogic {
       saveReceive: function(){ if (self.state.role !== 'owner'){ self.flash('เฉพาะเจ้าของระบบ'); return; } var st = self.state, q = parseInt(st.editQty,10); if (!q || q < 1){ self.flash('กรอกจำนวนรับเข้า'); return; } var qmax = st.receipts.filter(function(r){ return r.pid === st.editId; }).reduce(function(a,r){ return Math.max(a, r.qty||0); }, 0); if (q > Math.max(100, qmax*3) && st.editQtyAck !== q){ self.setState({editQtyAck:q}); self.flash('จำนวนมากผิดปกติ ถ้าถูกต้องให้กดยืนยันอีกครั้ง'); return; }
         var sk = Object.assign({}, st.stock); sk[st.editId] = (sk[st.editId]||0) + q;
         var bid = 'm'+Date.now(), bt = Object.assign({}, st.batches), mno = (st.editMemo||'').trim();
-        bt[bid] = {id:bid, date:st.editDate||TODAY, at:nowHM(), by:(st.role==='owner'?'Porcelain':'สมใจ'), src:'manual', memoNo:mno, memo:null, po:null, dateFrom:'กรอกเอง'};
+        bt[bid] = {id:bid, date:st.editDate||TODAY, at:nowHM(), by:DATA.myName, src:'manual', memoNo:mno, memo:null, po:null, dateFrom:'กรอกเอง'};
         self.setState({stock:sk, editQty:'', editQtyAck:null, batches:bt, receipts:[{date:st.editDate||TODAY, pid:st.editId, label:itemLabel(st.editId), qty:q, memo:mno, cost:null, batch:bid}].concat(st.receipts)});
         self.flash('รับเข้า '+itemLabel(st.editId)+' +'+q+' แล้ว'); },
       openImport: function(){ if (self.state.role !== 'owner'){ self.flash('เฉพาะเจ้าของระบบ'); return; } var st = self.state; self.setState(st.replaceId ? {imp2Open:true, imp2Step:0, memoLoaded:false, poLoaded:false, impLines:null, rDate:TODAY, replaceId:null, impMemoDoc:null, impPoDoc:null, dupAlert:null} : {imp2Open:true}); },
@@ -1840,7 +1652,7 @@ export class Component extends DCLogic {
       confirmReceive: function(){if (self.state.role !== 'owner'){ self.flash('เฉพาะเจ้าของระบบ'); return; } 
         var st = self.state, d = st.rDate || TODAY, sk = Object.assign({}, st.stock), pr = Object.assign({}, st.prices), rc = [], n = 0, made = 0, q0 = 0;
         var CM = st.impMemoDoc || IMP_MEMO, CP = st.impPoDoc || IMP_PO, rpId = st.replaceId, old = rpId ? st.batches[rpId] : null;
-        var bid = rpId || ('b'+Date.now()), bt = Object.assign({}, st.batches), by = st.role==='owner' ? 'Porcelain' : 'สมใจ';
+        var bid = rpId || ('b'+Date.now()), bt = Object.assign({}, st.batches), by = DATA.myName;
         var memoDoc = st.memoLoaded ? CM : (old ? old.memo : null), poDoc = st.poLoaded ? CP : (old ? old.po : null);
         var memoTxt = [memoDoc && memoDoc.no, poDoc && poDoc.no].filter(Boolean).join(', ');
         var base = st.receipts, oq = 0;
@@ -2146,7 +1958,7 @@ export class Component extends DCLogic {
           previewNote: es === 'both' ? 'ตัวอย่างไฟล์แรก (เครื่องแบบ)' : '', isU: pshop === 'u', isS: pshop === 's', showPrice: showP, showCost: showC, firstCol: pshop === 'u' ? 'ไซส์' : 'รายการ',
           groups: groups, rows: rows, total: 'รวม '+tot+' ชิ้น', value: [showD ? 'รอของ '+dTot : '', showC ? 'มูลค่าตามทุน '+baht(valC) : '', 'มูลค่าตามราคาขาย '+baht(valP)].filter(Boolean).join(', '),
           legend: own ? 'รอของ = ขอหลังของเข้าครั้งล่าสุด; ขอทั้งเทอม = นับตั้งแต่เปิดเทอม '+thD2(termStart)+' รวมคนที่แค่ถาม; ราคาทุนจาก PO ล่าสุด' : '',
-          by: 'พิมพ์โดย '+(isOwner ? 'Porcelain' : 'สมใจ')};
+          by: 'พิมพ์โดย '+DATA.myName};
       })(),
       openExp: function(){ if (self.state.role !== 'owner'){ self.flash('เฉพาะเจ้าของระบบ'); return; } self.setState({expOpen:true, expShop:null, expVer:'school'}); },
       closeExp: function(){ self.setState({expOpen:false}); },
@@ -2198,7 +2010,7 @@ export class Component extends DCLogic {
           items.forEach(function(i){ sk[i.pid] = (sk[i.pid]||0) - i.qty; });
           var tot = items.reduce(function(a,i){ return a+i.qty*i.price; },0), was = saleTotal(x);
           return Object.assign({}, x, {items: items, code: (ed.code||'').trim(), transfer: ed.pay === 'transfer' ? tot : 0, transferTime: ed.pay === 'transfer' ? ed.slip : '',
-            log: (x.log||[]).concat([{at:at, by:'Porcelain', text:'แก้ไขรายการ: ยอด '+baht(was)+' → '+baht(tot)}])});
+            log: (x.log||[]).concat([{at:at, by:DATA.myName, text:'แก้ไขรายการ: ยอด '+baht(was)+' → '+baht(tot)}])});
         });
         self.setState({sales:sales, stock:sk, saleEdit:null}); self.flash('บันทึกการแก้ไขแล้ว และปรับสต็อกตามส่วนต่าง'); },
       saleAskVoid: function(){ if (self.state.role !== 'owner'){ self.flash('เฉพาะเจ้าของระบบ'); return; } self.setState({saleVoidAsk:true}); },
@@ -2209,7 +2021,7 @@ export class Component extends DCLogic {
         var sales = st.sales.map(function(x){
           if (x.id !== st.saleId) return x;
           x.items.forEach(function(i){ sk[i.pid] = (sk[i.pid]||0) + i.qty; q += i.qty; });
-          return Object.assign({}, x, {voided:{at:at, by:'Porcelain'}, log:(x.log||[]).concat([{at:at, by:'Porcelain', text:'ยกเลิกการขาย: คืนสต็อก '+q+' ชิ้น'}])});
+          return Object.assign({}, x, {voided:{at:at, by:DATA.myName}, log:(x.log||[]).concat([{at:at, by:DATA.myName, text:'ยกเลิกการขาย: คืนสต็อก '+q+' ชิ้น'}])});
         });
         self.setState({sales:sales, stock:sk, saleVoidAsk:false}); self.flash('ยกเลิกการขายแล้ว (คืนสต็อก '+q+' ชิ้น)'); },
       exportFake: function(){ if (self.state.role !== 'owner'){ self.flash('เฉพาะเจ้าของระบบ'); return; } self.flash('ต้นแบบ: ส่งออก Excel ตามตัวกรองที่เลือก'); },
@@ -2242,7 +2054,7 @@ export class Component extends DCLogic {
         self.setState({rosters: st.rosters.concat([r2]), names: Object.assign({}, st.names, NEW_FILE.names), importStep:2, doneTerm:r2.term, doneEff:thDate(r2.eff)});
         self.flash('นำเข้ารายชื่อแล้ว');
       },
-      resetImport: function(){ self.setState({rosters:[R1], names:Object.assign({}, BASE_NAMES), importStep:0, fileChosen:false}); },
+      resetImport: function(){ self.setState({rosters:DATA.rosters.slice(), names:Object.assign({}, BASE_NAMES), importStep:0, fileChosen:false}); },
       staffRows: staffRows, newStaff: s.newStaff,
       onNewStaff: function(e){ self.setState({newStaff:e.target.value}); },
       addStaff: function(){ var v = (self.state.newStaff||'').trim(); if (!v){ self.flash('กรอกอีเมลก่อน'); return; } self.setState({staff:self.state.staff.concat([{name:'ครูผู้ช่วยใหม่', email:v}]), newStaff:''}); self.flash('เพิ่ม '+v+' แล้ว'); },
