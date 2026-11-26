@@ -196,6 +196,7 @@ export class Component extends DCLogic {
     document.addEventListener('focusin', function(e){ var t = e.target; if (t && t.tagName === 'INPUT' && t.type === 'number'){ setTimeout(function(){ try { t.select(); } catch(x){} }, 0); } });
     try { var dh0 = Number(localStorage.getItem('dockH')); if (dh0 >= 96) this.setState({dockH:dh0}); } catch(e){}
     try { var uc0 = JSON.parse(localStorage.getItem('uClosed') || 'null'); if (uc0) this.setState({uClosed:uc0}); } catch(e){}
+    try { var tl0 = JSON.parse(localStorage.getItem('tlPrefs') || 'null'); if (tl0) this.setState({tlFold:tl0.fold||{}, tlHi:tl0.hi||{}}); } catch(e){}
     var self = this;
     this._onScroll = function(){
       var el = document.getElementById('stuband');
@@ -1229,10 +1230,10 @@ export class Component extends DCLogic {
     var tlRec = s.receipts.filter(function(r){ var b = r.batch && s.batches[r.batch]; return !(b && b.voided) && PMAP[r.pid] && PMAP[r.pid].shop === (shopU ? 'u' : 's') && r.date >= TL0; });
     var tlDates = []; tlRec.forEach(function(r){ if (tlDates.indexOf(r.date) < 0) tlDates.push(r.date); }); tlDates.sort();
     var tlHead = tlDates.map(function(d, i){ var r = tlRec.filter(function(x){ return x.date === d; })[0], gap = i ? dayGap(tlDates[i-1], d) : 0;
-      return {pos:'left:'+tlPct(d)+'%', bcls:'tlbat'+(tlPct(d) < 7 ? ' st' : (tlPct(d) > 93 ? ' en' : '')), date: Number(d.slice(8))+'/'+Number(d.slice(5,7)), memo: (r.memo||'').split(',')[0].replace('สถพ ซ ',''), gap: i ? '+'+gap+' วัน' : '', gapCls:'tlgap'+(gap > 40 ? ' w' : ''),
+      return {pos:'left:'+tlPct(d)+'%', bcls:'tlbat'+(i % 2 ? ' odd' : '')+(tlPct(d) < 7 ? ' st' : (tlPct(d) > 93 ? ' en' : '')), date: Number(d.slice(8))+'/'+Number(d.slice(5,7)), memo: (r.memo||'').split(',')[0].replace('สถพ ซ ',''), gap: i ? '+'+gap+' วัน' : '', gapCls:'tlgap'+(gap > 40 ? ' w' : ''),
         open: function(){ if (r.batch) self.setState({rcvId:r.batch, rcvDoc:'memo', rcvPid:null}); }}; });
     var tlMonths = []; (function(){ var d = TL0.slice(0,8)+'01'; while (d <= TODAY){ var nx = addDays(d.slice(0,8)+'28', 4).slice(0,8)+'01'; var a = d < TL0 ? TL0 : d, b = nx > TODAY ? TODAY : nx;
-      tlMonths.push({label:THM[Number(d.slice(5,7))-1], pos:'left:'+tlPct(a)+'%;width:'+(tlPct(b)-tlPct(a))+'%', cls:'tlmb'+(tlMonths.length % 2 ? '' : ' alt')}); d = nx; } })();
+      tlMonths.push({label:(tlPct(b)-tlPct(a)) >= 12 ? THM[Number(d.slice(5,7))-1] : '', pos:'left:'+tlPct(a)+'%;width:'+(tlPct(b)-tlPct(a))+'%', cls:'tlmb'+(tlMonths.length % 2 ? '' : ' alt')}); d = nx; } })();
     var tlRow = function(p){
       var lvl = s.stock[p.id]||0, ev = [];
       s0.sales.forEach(function(x){ if (x.voided || x.date > TODAY) return; x.items.forEach(function(i){ if (i.pid === p.id) ev.push({d:x.date, q:-i.qty}); }); });
@@ -1244,10 +1245,17 @@ export class Component extends DCLogic {
       spans.reverse(); spans = spans.reduce(function(a, sp){ var l = a[a.length-1]; if (l && dayGap(l[1], sp[0]) <= 1) l[1] = sp[1]; else a.push(sp.slice()); return a; }, []);
       var boxes = tlRec.filter(function(r){ return r.pid === p.id; }).map(function(r){ return {q:r.qty, pos:'left:'+tlPct(r.date)+'%', title:thD2(r.date)+' '+r.memo+' รับ '+r.qty, open:function(){ if (r.batch) self.setState({rcvId:r.batch, rcvDoc:'memo', rcvPid:p.id}); }}; });
       var st = s.stock[p.id]||0, never = !boxes.length;
-      return {label: p.shop === 'u' ? (p.size ? '#'+p.size : p.name) : p.name, nameCls:'tlname'+(never ? ' never' : ''), open: openEditFor(p), boxes:boxes,
+      var hi = !!tlHi[p.id];
+      return {id:p.id, hi:hi, rowCls:'tlrow'+(hi ? ' hi' : ''), starCls:'tlstar'+(hi ? ' on' : ''), starAria:(hi ? 'เลิกไฮไลต์ ' : 'ไฮไลต์ ')+itemLabel(p.id),
+        star:function(){ var h = Object.assign({}, self.state.tlHi||{}); if (h[p.id]) delete h[p.id]; else h[p.id] = 1; self.setState({tlHi:h}); tlSave(self.state.tlFold||{}, h); },
+        label: p.shop === 'u' ? (p.size ? '#'+p.size : p.name) : p.name, nameCls:'tlname'+(never ? ' never' : ''), open: openEditFor(p), boxes:boxes,
         outs: spans.map(function(sp){ return {pos:'left:'+tlPct(sp[0])+'%;width:'+Math.max(0.6, tlPct(sp[1])-tlPct(sp[0]))+'%', title:'หมด '+thD2(sp[0])+' ถึง '+(sp[1] === TODAY ? 'วันนี้' : thD2(sp[1]))+' ('+dayGap(sp[0], sp[1])+' วัน)'}; }),
         stock: st, nowCls: 'tlnow'+(st <= 0 ? ' z' : (isLow(p.id) ? ' l' : ''))};
     };
+    var tlFold = s.tlFold || {}, tlHi = s.tlHi || {}, tlOnlyHi = !!s.tlOnlyHi;
+    var tlSave = function(fold, hi){ try { localStorage.setItem('tlPrefs', JSON.stringify({fold:fold, hi:hi})); } catch(e){} };
+    var tlSetFold = function(k, v){ var f = Object.assign({}, self.state.tlFold||{}); if (v) f[k] = 1; else delete f[k]; self.setState({tlFold:f}); tlSave(f, self.state.tlHi||{}); };
+    var tlHiN = Object.keys(tlHi).filter(function(id){ return PMAP[id] && PMAP[id].shop === (shopU ? 'u' : 's'); }).length;
     var stockView = [['grid','คงเหลือ'],['tl','ไทม์ไลน์']].map(function(v){ var on = (s.stockView||'grid') === v[0]; return {label:v[1], cls:'segb'+(on ? ' on' : ''), pick:function(){ self.setState({stockView:v[0]}); }}; });
     var stockCols = colsDef.map(function(c){
       var groups = [], by = {}, total = 0;
@@ -1260,6 +1268,16 @@ export class Component extends DCLogic {
       groups.forEach(function(g){ g.sumTxt = shopU ? g.sum+' ชิ้น' : (g.tiles[0].price); });
       return Object.assign({title:c[1], tlCls:'tlgrid'+(shopU ? '' : ' wide'), tlHeads: shopU, giCls:'gico '+(shopU ? 'gi-boy' : 'gi-'+c[0]), total:total, ledCls: shopU ? 'led' : 'led two', groups:groups, tilesCls: shopU ? 'stiles' : 'stiles wide'}, iconFlags(c[2]), sFlags(c[2]));
     }).filter(function(c){ return c.groups.length; });
+    if (tlOn) stockCols = stockCols.map(function(c){
+      var ck = (shopU ? 'u' : 's')+':'+c.title, cf = !!tlFold[ck];
+      var gs = c.groups.map(function(g){
+        var gk = ck+':'+g.name, rows = (g.tl||[]).filter(function(r){ return !tlOnlyHi || r.hi; }), gf = !!tlFold[gk] && !tlOnlyHi, nh = rows.filter(function(r){ return r.hi; }).length;
+        return Object.assign({}, g, {tl: gf ? [] : rows, tlShow: rows.length > 0, gOpen: !gf, gCls:'tlg'+(gf ? ' shut' : ''), gExp: gf ? 'false' : 'true', gMeta: (shopU ? (g.tl||[]).length+' ไซส์' : '')+(nh ? (shopU ? ' · ' : '')+'★ '+nh : ''), gTgl: function(){ tlSetFold(gk, !gf); }});
+      }).filter(function(g){ return g.tlShow; });
+      return Object.assign({}, c, {groups: cf && !tlOnlyHi ? [] : gs, cOpen: !cf || tlOnlyHi, cCls:'ucolh lh tlch'+(cf && !tlOnlyHi ? ' shut' : ''), cExp: cf ? 'false' : 'true', cTgl: function(){ tlSetFold(ck, !cf); }, tlHas: gs.length > 0});
+    }).filter(function(c){ return c.tlHas; });
+    var tlAllKeys = []; if (tlOn) stockCols.forEach(function(c){ tlAllKeys.push((shopU ? 'u' : 's')+':'+c.title); });
+    var tlAnyFold = tlAllKeys.some(function(k){ return tlFold[k]; }) || Object.keys(tlFold).some(function(k){ return k.indexOf((shopU ? 'u' : 's')+':') === 0; });
     var shopProds = PRODUCTS.filter(function(p){ return p.shop===(shopU?'u':'s'); });
     var cLow = shopProds.filter(function(p){ return isLow(p.id); }).length;
     var cOut = shopProds.filter(function(p){ return s.prices[p.id] > 0 && s.stock[p.id] <= 0; }).length;
@@ -2051,7 +2069,12 @@ export class Component extends DCLogic {
         });
         self.setState({sales:sales, stock:sk, saleVoidAsk:false}); self.flash('ยกเลิกการขายแล้ว (คืนสต็อก '+q+' ชิ้น)'); },
       exportFake: function(){ if (self.state.role !== 'owner'){ self.flash('เฉพาะเจ้าของระบบ'); return; } self.flash('ต้นแบบ: ส่งออก Excel ตามตัวกรองที่เลือก'); },
-      stockView: stockView, tl: {on: tlOn, off: !tlOn, head: tlHead, months: tlMonths, range: thD2(TL0)+' ถึง '+thD2(TODAY), none: !tlHead.length}, stockShopChips: stockShopChips, stockChips: stockChips, stockRows: stockRows, stockEmpty: stockCols.length === 0,
+      stockView: stockView, tl: {on: tlOn, off: !tlOn, head: tlHead, months: tlMonths, range: thD2(TL0)+' ถึง '+thD2(TODAY), none: !tlHead.length,
+        hiCls:'btn ghost sm tlhib'+(tlOnlyHi ? ' on' : ''), hiLabel: 'เฉพาะที่ไฮไลต์'+(tlHiN ? ' ('+tlHiN+')' : ''), hiPressed: tlOnlyHi ? 'true' : 'false',
+        hiTgl: function(){ if (!tlHiN && !tlOnlyHi){ self.flash('แตะดาวหน้าไซส์เพื่อไฮไลต์ก่อน'); return; } self.setState({tlOnlyHi: !tlOnlyHi}); },
+        foldLabel: tlAnyFold ? 'กางทั้งหมด' : 'พับทั้งหมด', foldAll: function(){ var f = Object.assign({}, self.state.tlFold||{}), pre = (shopU ? 'u' : 's')+':';
+          Object.keys(f).forEach(function(k){ if (k.indexOf(pre) === 0) delete f[k]; }); if (!tlAnyFold) tlAllKeys.forEach(function(k){ f[k] = 1; }); self.setState({tlFold:f}); tlSave(f, self.state.tlHi||{}); },
+        empty: tlOnlyHi && !stockCols.length}, stockShopChips: stockShopChips, stockChips: stockChips, stockRows: stockRows, stockEmpty: stockCols.length === 0,
       restockQty: s.restockQty, restockMemo: s.restockMemo, receipts: receipts,
       onRQty: function(e){ self.setState({restockQty:e.target.value}); },
       onRMemo: function(e){ self.setState({restockMemo:e.target.value}); },
