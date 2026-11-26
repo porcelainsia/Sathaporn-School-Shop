@@ -502,6 +502,28 @@
         </sc-for>
       </div>
       </section>
+      <div class="stkview"><div class="seg" role="group" aria-label="มุมมองสต็อก"><sc-for list="{{stockView}}" as="v" hint-placeholder-count="2"><button class="{{v.cls}}" onClick="{{v.pick}}">{{v.label}}</button></sc-for></div><sc-if value="{{tl.on}}" hint-placeholder-val="{{false}}"><span class="small muted">{{tl.range}} · แตะตัวเลขเพื่อดูเอกสารรับเข้า</span></sc-if></div>
+      <sc-if value="{{tl.on}}" hint-placeholder-val="{{false}}">
+      <div class="tlwrap">
+        <sc-for list="{{stockCols}}" as="col" hint-placeholder-count="2">
+          <section class="led tlcard">
+            <div class="ucolh lh"><span class="{{col.giCls}}"><span class="icm ico" style="{{col.icoM}}" aria-hidden="true"></span></span><span>{{col.title}}</span><span class="small muted mono" style="margin-left: auto">{{col.total}} ชิ้น</span></div>
+            <div class="tlscroll"><div class="{{col.tlCls}}">
+              <div class="tlover" aria-hidden="true"><sc-for list="{{tl.months}}" as="m" hint-placeholder-count="6"><span class="{{m.cls}}" style="{{m.pos}}"></span></sc-for><sc-for list="{{tl.head}}" as="h" hint-placeholder-count="4"><span class="tlvl" style="{{h.pos}}"></span></sc-for></div>
+              <div class="tlhead"><span class="tlname"></span><div class="tllane"><sc-for list="{{tl.head}}" as="h" hint-placeholder-count="4"><button class="{{h.bcls}}" style="{{h.pos}}" onClick="{{h.open}}"><span class="{{h.gapCls}}">{{h.gap}}</span><b>{{h.date}}</b><small>{{h.memo}}</small></button></sc-for><sc-for list="{{tl.months}}" as="m" hint-placeholder-count="6"><span class="tlmo" style="{{m.pos}}">{{m.label}}</span></sc-for></div><span class="tlnow h">เหลือ</span></div>
+              <sc-for list="{{col.groups}}" as="g" hint-placeholder-count="2">
+                <sc-if value="{{col.tlHeads}}" hint-placeholder-val="{{true}}"><div class="tlg"><span class="{{g.giCls}}"><span class="icm ico" style="{{g.icoM}}" aria-hidden="true"></span></span><b>{{g.name}}</b></div></sc-if>
+                <sc-for list="{{g.tl}}" as="r" hint-placeholder-count="4">
+                  <div class="tlrow"><button class="{{r.nameCls}}" onClick="{{r.open}}">{{r.label}}</button><div class="tllane"><i class="tlline"></i><sc-for list="{{r.outs}}" as="o" hint-placeholder-count="1"><span class="tlout" style="{{o.pos}}" title="{{o.title}}"></span></sc-for><sc-for list="{{r.boxes}}" as="b" hint-placeholder-count="2"><button class="tlq" style="{{b.pos}}" title="{{b.title}}" onClick="{{b.open}}">{{b.q}}</button></sc-for></div><span class="{{r.nowCls}}">{{r.stock}}</span></div>
+                </sc-for>
+              </sc-for>
+            </div></div>
+          </section>
+        </sc-for>
+        <div class="tlleg small muted"><span><i class="lq">10</i>รับเข้า (จำนวน)</span><span><i class="lo"></i>หมด</span><span><i class="lv"></i>รอบรับเข้า</span><span><b class="lw">+52 วัน</b> ห่างจากรอบก่อน (สีส้ม = เกิน 40 วัน)</span><span><b class="ln">#42</b> ยังไม่เคยรับเข้าเทอมนี้</span></div>
+      </div>
+      </sc-if>
+      <sc-if value="{{tl.off}}" hint-placeholder-val="{{true}}">
       <div class="ledger">
         <sc-for list="{{stockCols}}" as="col" hint-placeholder-count="3">
           <section class="{{col.ledCls}}">
@@ -528,6 +550,7 @@
           </section>
         </sc-if>
       </div>
+      </sc-if>
       <sc-if value="{{stockEmpty}}" hint-placeholder-val="{{false}}"><div class="empty">ไม่มีสินค้าในตัวกรองนี้</div></sc-if>
       <section class="card" style="display: flex; flex-direction: column; gap: 12px">
         <h2>ประวัติการรับเข้า</h2>

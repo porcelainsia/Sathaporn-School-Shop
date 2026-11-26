@@ -1223,16 +1223,42 @@ export class Component extends DCLogic {
           self.setState({stock:sk, merges:(st.merges||[]).filter(function(x){ return x !== m; }), unmergeAsk:null}); self.okFlash('ยกเลิกการรวมแล้ว', '', '', null, itemLabel(m.from)+' กลับมาขายได้ คืนสต็อก '+back+' ชิ้น', 'info'); }}, iconFlags(p.icon, p), sFlags(p.icon, p));
     });
     var colsDef = shopU ? [['top','เสื้อ','shirt'],['bottom','ท่อนล่าง','pants'],['set','ชุดเต็มตัว','set']] : [['write','เขียนและลบ','pencil'],['paper','สมุดและบัตร','book'],['tools','ลูกเสือและเนตรนารี','scissors']];
+    // stock timeline: deliveries placed on real dates, red where a size was sold out
+    var tlOn = s.stockView === 'tl', TL0 = termStart, TLN = Math.max(1, dayGap(TL0, TODAY));
+    var tlPct = function(iso){ return 3 + 94 * Math.max(0, Math.min(1, dayGap(TL0, iso) / TLN)); };
+    var tlRec = s.receipts.filter(function(r){ var b = r.batch && s.batches[r.batch]; return !(b && b.voided) && PMAP[r.pid] && PMAP[r.pid].shop === (shopU ? 'u' : 's') && r.date >= TL0; });
+    var tlDates = []; tlRec.forEach(function(r){ if (tlDates.indexOf(r.date) < 0) tlDates.push(r.date); }); tlDates.sort();
+    var tlHead = tlDates.map(function(d, i){ var r = tlRec.filter(function(x){ return x.date === d; })[0], gap = i ? dayGap(tlDates[i-1], d) : 0;
+      return {pos:'left:'+tlPct(d)+'%', bcls:'tlbat'+(tlPct(d) < 7 ? ' st' : (tlPct(d) > 93 ? ' en' : '')), date: Number(d.slice(8))+'/'+Number(d.slice(5,7)), memo: (r.memo||'').split(',')[0].replace('สถพ ซ ',''), gap: i ? '+'+gap+' วัน' : '', gapCls:'tlgap'+(gap > 40 ? ' w' : ''),
+        open: function(){ if (r.batch) self.setState({rcvId:r.batch, rcvDoc:'memo', rcvPid:null}); }}; });
+    var tlMonths = []; (function(){ var d = TL0.slice(0,8)+'01'; while (d <= TODAY){ var nx = addDays(d.slice(0,8)+'28', 4).slice(0,8)+'01'; var a = d < TL0 ? TL0 : d, b = nx > TODAY ? TODAY : nx;
+      tlMonths.push({label:THM[Number(d.slice(5,7))-1], pos:'left:'+tlPct(a)+'%;width:'+(tlPct(b)-tlPct(a))+'%', cls:'tlmb'+(tlMonths.length % 2 ? '' : ' alt')}); d = nx; } })();
+    var tlRow = function(p){
+      var lvl = s.stock[p.id]||0, ev = [];
+      s0.sales.forEach(function(x){ if (x.voided || x.date > TODAY) return; x.items.forEach(function(i){ if (i.pid === p.id) ev.push({d:x.date, q:-i.qty}); }); });
+      tlRec.forEach(function(r){ if (r.pid === p.id) ev.push({d:r.date, q:r.qty}); });
+      ev.sort(function(a, b){ return b.d.localeCompare(a.d); });
+      var spans = [], cur = TODAY;
+      for (var k = 0; k < ev.length && cur > TL0; k++){ var d = ev[k].d < TL0 ? TL0 : ev[k].d; if (lvl === 0 && d < cur) spans.push([d, cur]); lvl -= ev[k].q; cur = d; }
+      if (cur > TL0 && lvl === 0) spans.push([TL0, cur]);
+      spans.reverse(); spans = spans.reduce(function(a, sp){ var l = a[a.length-1]; if (l && dayGap(l[1], sp[0]) <= 1) l[1] = sp[1]; else a.push(sp.slice()); return a; }, []);
+      var boxes = tlRec.filter(function(r){ return r.pid === p.id; }).map(function(r){ return {q:r.qty, pos:'left:'+tlPct(r.date)+'%', title:thD2(r.date)+' '+r.memo+' รับ '+r.qty, open:function(){ if (r.batch) self.setState({rcvId:r.batch, rcvDoc:'memo', rcvPid:p.id}); }}; });
+      var st = s.stock[p.id]||0, never = !boxes.length;
+      return {label: p.shop === 'u' ? (p.size ? '#'+p.size : p.name) : p.name, nameCls:'tlname'+(never ? ' never' : ''), open: openEditFor(p), boxes:boxes,
+        outs: spans.map(function(sp){ return {pos:'left:'+tlPct(sp[0])+'%;width:'+Math.max(0.6, tlPct(sp[1])-tlPct(sp[0]))+'%', title:'หมด '+thD2(sp[0])+' ถึง '+(sp[1] === TODAY ? 'วันนี้' : thD2(sp[1]))+' ('+dayGap(sp[0], sp[1])+' วัน)'}; }),
+        stock: st, nowCls: 'tlnow'+(st <= 0 ? ' z' : (isLow(p.id) ? ' l' : ''))};
+    };
+    var stockView = [['grid','คงเหลือ'],['tl','ไทม์ไลน์']].map(function(v){ var on = (s.stockView||'grid') === v[0]; return {label:v[1], cls:'segb'+(on ? ' on' : ''), pick:function(){ self.setState({stockView:v[0]}); }}; });
     var stockCols = colsDef.map(function(c){
       var groups = [], by = {}, total = 0;
       PRODUCTS.filter(function(p){ return p.shop===(shopU?'u':'s') && (shopU ? p.part===c[0] : p.cat===c[0]); }).forEach(function(p){
         total += s.stock[p.id];
         if (!stPass(p)) return;
         if (!by[p.name]){ by[p.name] = Object.assign({name:p.name, giCls:'gico gi-'+stTone(p)+gx(p.name), tiles:[]}, iconFlags(p.icon, p), sFlags(p.icon, p)); groups.push(by[p.name]); }
-        by[p.name].tiles.push(mkStockTile(p)); by[p.name].sum = (by[p.name].sum||0) + s.stock[p.id];
+        by[p.name].tiles.push(mkStockTile(p)); if (tlOn){ by[p.name].tl = by[p.name].tl || []; by[p.name].tl.push(tlRow(p)); } by[p.name].sum = (by[p.name].sum||0) + s.stock[p.id];
       });
       groups.forEach(function(g){ g.sumTxt = shopU ? g.sum+' ชิ้น' : (g.tiles[0].price); });
-      return Object.assign({title:c[1], giCls:'gico '+(shopU ? 'gi-boy' : 'gi-'+c[0]), total:total, ledCls: shopU ? 'led' : 'led two', groups:groups, tilesCls: shopU ? 'stiles' : 'stiles wide'}, iconFlags(c[2]), sFlags(c[2]));
+      return Object.assign({title:c[1], tlCls:'tlgrid'+(shopU ? '' : ' wide'), tlHeads: shopU, giCls:'gico '+(shopU ? 'gi-boy' : 'gi-'+c[0]), total:total, ledCls: shopU ? 'led' : 'led two', groups:groups, tilesCls: shopU ? 'stiles' : 'stiles wide'}, iconFlags(c[2]), sFlags(c[2]));
     }).filter(function(c){ return c.groups.length; });
     var shopProds = PRODUCTS.filter(function(p){ return p.shop===(shopU?'u':'s'); });
     var cLow = shopProds.filter(function(p){ return isLow(p.id); }).length;
@@ -2025,7 +2051,7 @@ export class Component extends DCLogic {
         });
         self.setState({sales:sales, stock:sk, saleVoidAsk:false}); self.flash('ยกเลิกการขายแล้ว (คืนสต็อก '+q+' ชิ้น)'); },
       exportFake: function(){ if (self.state.role !== 'owner'){ self.flash('เฉพาะเจ้าของระบบ'); return; } self.flash('ต้นแบบ: ส่งออก Excel ตามตัวกรองที่เลือก'); },
-      stockShopChips: stockShopChips, stockChips: stockChips, stockRows: stockRows, stockEmpty: stockCols.length === 0,
+      stockView: stockView, tl: {on: tlOn, off: !tlOn, head: tlHead, months: tlMonths, range: thD2(TL0)+' ถึง '+thD2(TODAY), none: !tlHead.length}, stockShopChips: stockShopChips, stockChips: stockChips, stockRows: stockRows, stockEmpty: stockCols.length === 0,
       restockQty: s.restockQty, restockMemo: s.restockMemo, receipts: receipts,
       onRQty: function(e){ self.setState({restockQty:e.target.value}); },
       onRMemo: function(e){ self.setState({restockMemo:e.target.value}); },

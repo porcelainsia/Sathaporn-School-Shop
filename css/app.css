@@ -2059,3 +2059,45 @@ html:has(.uwrap.open){overflow:hidden}
 .mtitle{font-size:20px;font-weight:700;line-height:28px}
 .btn{border-radius:12px}
 input,select,textarea{font-size:16px}
+
+/* ===== stock timeline view ===== */
+.stkview{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.stkview .segb{min-width:112px}
+.tlwrap{display:flex;flex-direction:column;gap:16px}
+.tlscroll{overflow-x:auto;padding:4px 16px 12px}
+.tlgrid{position:relative;min-width:760px;--nw:72px;--sw:56px}
+.tlgrid.wide{--nw:200px}
+.tlover{position:absolute;top:0;bottom:0;left:var(--nw);right:var(--sw);pointer-events:none}
+.tlmb{position:absolute;top:0;bottom:0}.tlmb.alt{background:#F6F7F9}
+.tlvl{position:absolute;top:44px;bottom:0;border-left:1px dashed #9AA5B1}
+.tlhead,.tlrow{position:relative;display:grid;grid-template-columns:var(--nw) minmax(0,1fr) var(--sw);align-items:center}
+.tlhead{height:72px;align-items:stretch}
+.tlhead .tllane{position:relative}
+.tlbat{position:absolute;top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;border:0;background:none;padding:0 2px;cursor:pointer;font:inherit;line-height:14px}
+.tlbat b{font:600 11px/14px 'Kanit',sans-serif;color:var(--ink)}
+.tlbat small{font:500 10px/12px 'Kanit',sans-serif;color:var(--muted)}
+.tlgap{font:500 10px/14px 'Kanit',sans-serif;color:var(--muted);min-height:14px}.tlgap.w{color:#A86A00;font-weight:600}
+.tlbat.st{transform:none;align-items:flex-start}.tlbat.en{transform:translateX(-100%);align-items:flex-end}
+.tlbat:hover b{text-decoration:underline}
+.tlmo{position:absolute;bottom:4px;font:500 11px 'Kanit',sans-serif;color:var(--muted);padding-left:6px;box-sizing:border-box;white-space:nowrap}
+.tlnow{text-align:right;font:600 14px 'Kanit',sans-serif;font-variant-numeric:tabular-nums;color:var(--ink)}
+.tlnow.h{font:500 11px 'Kanit';color:var(--muted);align-self:end;padding-bottom:4px}
+.tlnow.z{color:#B4342C}.tlnow.l{color:#A86A00}
+.tlg{position:relative;display:flex;align-items:center;gap:8px;padding:10px 0 4px;font-size:14px}
+.tlg .gico{width:24px;height:24px;border-radius:7px}
+.tlrow{height:32px;border-top:1px solid #EEF0F2}
+.tlname{border:0;background:none;padding:0;font:500 14px 'Kanit',sans-serif;color:var(--ink);text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tlname.never{color:#B4342C}
+.tlname:hover{text-decoration:underline}
+.tlrow .tllane{position:relative;height:100%}
+.tlline{position:absolute;left:0;right:0;top:50%;border-top:1.5px solid #C5CCD4}
+.tlout{position:absolute;top:50%;height:4px;margin-top:-2px;background:#D2544A;border-radius:2px}
+.tlq{position:absolute;top:50%;transform:translate(-50%,-50%);min-width:24px;height:20px;padding:0 5px;box-sizing:border-box;border:1.5px solid var(--ink);border-radius:6px;background:#fff;font:600 11.5px/17px 'Kanit',sans-serif;color:var(--ink);cursor:pointer}
+.tlq:hover{background:var(--ink);color:#fff}
+.tlleg{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center}
+.tlleg span{display:inline-flex;align-items:center;gap:6px}
+.tlleg .lq{font:600 10px/14px 'Kanit';font-style:normal;border:1.5px solid var(--ink);border-radius:5px;padding:0 4px;color:var(--ink)}
+.tlleg .lo{display:inline-block;width:22px;height:4px;border-radius:2px;background:#D2544A}
+.tlleg .lv{display:inline-block;height:14px;border-left:1px dashed #9AA5B1}
+.tlleg .lw{color:#A86A00;font:600 11px 'Kanit'}.tlleg .ln{color:#B4342C;font:500 12px 'Kanit'}
+@media (max-width:760px){.tlscroll{padding:4px 12px 12px}.tlgrid{min-width:640px;--nw:56px;--sw:40px}.tlgrid.wide{--nw:150px}.tlhead .tlname,.tlrow .tlname{position:sticky;left:0;z-index:2;background:#fff}}
